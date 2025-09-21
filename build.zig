@@ -9,10 +9,13 @@ pub fn build(b: *std.Build) void {
         .optimize = optimize,
     });
 
-    const lib = b.addStaticLibrary(.{
+    const lib = b.addLibrary(.{
         .name = "vorbis",
-        .target = target,
-        .optimize = optimize,
+        .root_module = b.createModule(.{
+            .target = target,
+            .optimize = optimize,
+        }),
+        .linkage = std.builtin.LinkMode.static,
     });
     lib.linkLibrary(libogg_dep.artifact("ogg"));
     lib.addIncludePath(b.path("include"));
