@@ -14,13 +14,14 @@ pub fn build(b: *std.Build) void {
         .root_module = b.createModule(.{
             .target = target,
             .optimize = optimize,
+            .link_libc = true,
         }),
-        .linkage = std.builtin.LinkMode.static,
+        .linkage = .static,
     });
-    lib.linkLibrary(libogg_dep.artifact("ogg"));
-    lib.addIncludePath(b.path("include"));
-    lib.addIncludePath(b.path("lib"));
-    lib.addCSourceFiles(.{
+    lib.root_module.linkLibrary(libogg_dep.artifact("ogg"));
+    lib.root_module.addIncludePath(b.path("include"));
+    lib.root_module.addIncludePath(b.path("lib"));
+    lib.root_module.addCSourceFiles(.{
         .files = &.{
             "lib/analysis.c",
             "lib/bitrate.c",
@@ -47,7 +48,6 @@ pub fn build(b: *std.Build) void {
             "lib/vorbisenc.c",
         },
     });
-    lib.linkLibC();
     lib.installHeadersDirectory(b.path("include/vorbis"), "vorbis", .{});
     b.installArtifact(lib);
 }
